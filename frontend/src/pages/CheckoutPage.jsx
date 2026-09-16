@@ -11,6 +11,7 @@ function CheckoutPage() {
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState(false);
 
   const [formData, setFormData] = useState({
     address: '',
@@ -66,7 +67,7 @@ function CheckoutPage() {
 
       await API.post('/orders', orderPayload);
       dispatch(clearCart());
-      navigate('/');
+      setOrderSuccess(true);
     } catch (err) {
       setError(err.response?.data?.message || 'Unable to place order');
     } finally {
@@ -74,7 +75,7 @@ function CheckoutPage() {
     }
   };
 
-  if (cartItems.length === 0) {
+  if (cartItems.length === 0 && !orderSuccess) {
     return (
       <div className="flex min-h-screen items-center justify-center px-4">
         <div className="rounded-2xl bg-white p-10 text-center shadow-sm ring-1 ring-slate-200">
@@ -88,7 +89,8 @@ function CheckoutPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+    <>
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="grid gap-8 lg:grid-cols-[1.3fr_0.7fr]">
         <form onSubmit={handleSubmit} className="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
           <h1 className="text-3xl font-bold text-slate-900">Checkout</h1>
@@ -199,7 +201,27 @@ function CheckoutPage() {
           </div>
         </aside>
       </div>
-    </div>
+      </div>
+
+      {orderSuccess && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4" role="dialog" aria-modal="true">
+          <div className="w-full max-w-md rounded-3xl bg-white p-8 text-center shadow-2xl">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-2xl text-emerald-600">
+              ✓
+            </div>
+            <h2 className="mt-5 text-2xl font-bold text-slate-900">Order placed successfully</h2>
+            <p className="mt-2 text-slate-600">Thanks for shopping with ShopSphere. Your order has been received.</p>
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="mt-6 w-full rounded-full bg-indigo-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-indigo-500"
+            >
+              Continue Shopping
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 

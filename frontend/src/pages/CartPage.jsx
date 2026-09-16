@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { removeFromCart, updateQuantity } from '../redux/cartSlice';
+import { clearCart, removeFromCart, updateQuantity } from '../redux/cartSlice';
 
 function CartPage() {
   const dispatch = useDispatch();
@@ -11,7 +11,18 @@ function CartPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
-        <h1 className="text-3xl font-bold text-slate-900">Your Cart</h1>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <h1 className="text-3xl font-bold text-slate-900">Your Cart</h1>
+          {cartItems.length > 0 && (
+            <button
+              type="button"
+              onClick={() => dispatch(clearCart())}
+              className="text-sm font-medium text-red-600 underline underline-offset-4 hover:text-red-500"
+            >
+              Remove all items
+            </button>
+          )}
+        </div>
 
         {cartItems.length === 0 ? (
           <div className="mt-8">
@@ -49,8 +60,9 @@ function CartPage() {
                     className="w-16 rounded-md border border-slate-300 px-2 py-1 text-center"
                   />
                   <button
+                    type="button"
                     onClick={() => dispatch(removeFromCart(item._id))}
-                    className="text-sm font-medium text-red-600 hover:underline"
+                    className="rounded-lg border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
                   >
                     Remove
                   </button>
