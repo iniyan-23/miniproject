@@ -44,6 +44,9 @@ function HomePage() {
         >
           Cart ({cartItems.reduce((total, item) => total + item.quantity, 0)})
         </Link>
+        <Link to="/orders" className="text-sm font-medium text-indigo-600 hover:underline">
+          My Orders
+        </Link>
       </header>
 
       <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
