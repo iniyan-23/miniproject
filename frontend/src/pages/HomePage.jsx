@@ -74,10 +74,12 @@ function HomePage() {
                   {product.countInStock > 0 ? `${product.countInStock} in stock` : 'Out of stock'}
                 </span>
                 <button
+                  type="button"
+                  disabled={product.countInStock === 0}
                   onClick={() => dispatch(addToCart(product))}
-                  className="rounded-full bg-indigo-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-indigo-500"
+                  className="rounded-full bg-indigo-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-slate-300"
                 >
-                  Add to cart
+                  {product.countInStock > 0 ? 'Add to cart' : 'Out of stock'}
                 </button>
               </div>
 

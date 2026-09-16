@@ -1,6 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import Order from '../models/Order.js';
+import Product from '../models/Product.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 // @desc    Create new order
@@ -16,10 +17,44 @@ router.post('/', protect, async (req, res) => {
     totalPrice,
   } = req.body;
 
-  if (orderItems && orderItems.length === 0) {
+  if (!orderItems || orderItems.length === 0) {
     res.status(400);
     throw new Error('No order items');
-  } else {
+  }
+
+  const quantityByProduct = new Map();
+  for (const item of orderItems) {
+    const quantity = Number(item.qty);
+
+    if (!item.product || !Number.isInteger(quantity) || quantity < 1) {
+      res.status(400);
+      throw new Error('Invalid order item');
+    }
+
+    quantityByProduct.set(
+      item.product,
+      (quantityByProduct.get(item.product) || 0) + quantity,
+    );
+  }
+
+  const updatedProducts = [];
+
+  try {
+    for (const [productId, quantity] of quantityByProduct) {
+      const product = await Product.findOneAndUpdate(
+        { _id: productId, countInStock: { $gte: quantity } },
+        { $inc: { countInStock: -quantity } },
+        { returnDocument: 'after' },
+      );
+
+      if (!product) {
+        res.status(400);
+        throw new Error('One or more products do not have enough stock');
+      }
+
+      updatedProducts.push({ productId, quantity });
+    }
+
     const order = new Order({
       user: req.user._id,
       orderItems,
@@ -33,6 +68,12 @@ router.post('/', protect, async (req, res) => {
 
     const createdOrder = await order.save();
     res.status(201).json(createdOrder);
+  } catch (error) {
+    for (const { productId, quantity } of updatedProducts) {
+      await Product.findByIdAndUpdate(productId, { $inc: { countInStock: quantity } });
+    }
+
+    throw error;
   }
 });
 
@@ -107,6 +148,11 @@ router.put('/:id/cancel', protect, async (req, res) => {
 
   order.status = 'Cancelled';
   order.cancelledAt = new Date();
+
+  for (const item of order.orderItems) {
+    await Product.findByIdAndUpdate(item.product, { $inc: { countInStock: item.qty } });
+  }
+
   res.json(await order.save());
 });
 

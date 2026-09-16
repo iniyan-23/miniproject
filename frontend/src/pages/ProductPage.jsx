@@ -68,10 +68,12 @@ function ProductPage() {
           </div>
 
           <button
+            type="button"
+            disabled={product.countInStock === 0}
             onClick={() => dispatch(addToCart(product))}
-            className="mt-8 rounded-full bg-slate-900 px-6 py-3 text-base font-medium text-white transition hover:bg-slate-700"
+            className="mt-8 rounded-full bg-slate-900 px-6 py-3 text-base font-medium text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-300"
           >
-            Add to Cart
+            {product.countInStock > 0 ? 'Add to Cart' : 'Out of Stock'}
           </button>
         </div>
       </div>
