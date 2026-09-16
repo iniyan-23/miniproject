@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import API from '../services/api';
+import { logout } from '../redux/authSlice';
 
 const emptyAddress = {
   address: '',
@@ -17,6 +20,8 @@ const getStatusStyle = (status) => {
 };
 
 function OrdersPage() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -123,7 +128,19 @@ function OrdersPage() {
           <p className="text-sm font-medium uppercase tracking-[0.2em] text-indigo-600">ShopSphere</p>
           <h1 className="mt-2 text-3xl font-bold text-slate-900">My Orders</h1>
         </div>
-        <Link to="/" className="text-sm font-medium text-indigo-600 hover:underline">Back to products</Link>
+        <div className="flex items-center gap-4">
+          <Link to="/" className="text-sm font-medium text-indigo-600 hover:underline">Back to products</Link>
+          <button
+            type="button"
+            onClick={() => {
+              dispatch(logout());
+              navigate('/login');
+            }}
+            className="text-sm font-medium text-slate-600 hover:text-red-600"
+          >
+            Logout
+          </button>
+        </div>
       </div>
 
       {error && <p className="mb-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">{error}</p>}

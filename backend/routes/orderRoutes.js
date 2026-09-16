@@ -98,7 +98,9 @@ router.put('/:id/cancel', protect, async (req, res) => {
     throw new Error('Order not found');
   }
 
-  if (order.status !== 'Processing') {
+  const currentStatus = order.status || 'Processing';
+
+  if (currentStatus !== 'Processing') {
     res.status(400);
     throw new Error('Only processing orders can be cancelled');
   }

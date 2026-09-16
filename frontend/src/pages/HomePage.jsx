@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import API from '../services/api';
 import { addToCart } from '../redux/cartSlice';
+import { logout } from '../redux/authSlice';
 
 function HomePage() {
   const [products, setProducts] = useState([]);
@@ -47,6 +48,13 @@ function HomePage() {
         <Link to="/orders" className="text-sm font-medium text-indigo-600 hover:underline">
           My Orders
         </Link>
+        <button
+          type="button"
+          onClick={() => dispatch(logout())}
+          className="text-sm font-medium text-slate-600 hover:text-red-600"
+        >
+          Logout
+        </button>
       </header>
 
       <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
